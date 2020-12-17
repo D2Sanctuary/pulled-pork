@@ -39,7 +39,7 @@ client.on("message", (msg) => {
     if (number < 1 || number > 15) {
       msg.reply("The wish number must be between 1 and 15, inclusive.");
     }
-    msg.reply(wishesWithEmoji[number]);
+    msg.channel.send(wishesWithEmoji[number]);
   }
 });
 
