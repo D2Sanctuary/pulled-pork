@@ -4,23 +4,29 @@ import wishes from "./wishes.json";
 import symbols from "./symbols.json";
 const client = new Client();
 
-const wishesWithEmoji = Object.entries(wishes)
-  .map(([number, wishCode]) => ({
-    [number]: [...wishCode]
-      .map((code, i) => {
-        if (code === " ") {
-          return ":redbrain:";
-        }
-        const index = parseInt(code, 16);
-        const symbol = symbols[index];
-        const ending = i === 4 || i === 9 || i === 14 ? "\n" : "";
-        return `:LW_${symbol}:${ending}`;
-      })
-      .join(""),
-  }))
-  .reduce<{ [wishNumber: string]: string }>((a, b) => ({ ...a, ...b }), {});
+let wishesWithEmoji: { [wishNumber: string]: string } = {};
 
-client.on("ready", () => console.log("Ready!"));
+client.on("ready", () => {
+  wishesWithEmoji = Object.entries(wishes)
+    .map(([number, wishCode]) => ({
+      [number]: [...wishCode]
+        .map((code, i) => {
+          if (code === " ") {
+            return client.emojis.cache.findKey(
+              (emoji) => emoji.name === "redbrain"
+            );
+          }
+          const index = parseInt(code, 16);
+          const symbol = symbols[index];
+          const ending = i === 4 || i === 9 || i === 14 ? "\n" : "";
+          return `${client.emojis.cache.findKey(
+            (emoji) => emoji.name === `LW_${symbol}`
+          )}${ending}`;
+        })
+        .join(""),
+    }))
+    .reduce<{ [wishNumber: string]: string }>((a, b) => ({ ...a, ...b }), {});
+});
 
 client.on("message", (msg) => {
   if (msg.author.bot) return;
