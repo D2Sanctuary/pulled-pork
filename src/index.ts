@@ -12,14 +12,14 @@ client.on("ready", () => {
       [number]: [...wishCode]
         .map((code, i) => {
           if (code === " ") {
-            return client.emojis.cache.findKey(
+            return client.emojis.cache.find(
               (emoji) => emoji.name === "redbrain"
             );
           }
           const index = parseInt(code, 16);
           const symbol = symbols[index];
           const ending = i === 4 || i === 9 || i === 14 ? "\n" : "";
-          return `${client.emojis.cache.findKey(
+          return `${client.emojis.cache.find(
             (emoji) => emoji.name === `LW_${symbol}`
           )}${ending}`;
         })
