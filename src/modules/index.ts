@@ -1,21 +1,22 @@
 import { Client, Message } from "discord.js";
+import { QueryFn } from "../util";
+
+type MessageHandler = (msg: Message) => Promise<void>;
 
 interface Module {
-  init: (client: Client) => (msg: Message) => void;
+  init: (client: Client, query: QueryFn) => Promise<MessageHandler>;
 }
 
 const modules: Module[] = [require("./wish")];
 
-export function init(client: Client) {
-  const msgHandlers: ((msg: Message) => void)[] = [];
+export async function init(client: Client, query: QueryFn) {
+  const msgHandlers: MessageHandler[] = [];
 
   for (const module of modules) {
-    msgHandlers.push(module.init(client));
+    msgHandlers.push(await module.init(client, query));
   }
 
   return (msg: Message) => {
-    for (const handler of msgHandlers) {
-      handler(msg);
-    }
+    return Promise.all(msgHandlers.map((handler) => handler(msg)));
   };
 }
